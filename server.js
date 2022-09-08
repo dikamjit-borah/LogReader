@@ -3,6 +3,7 @@ const fs = require('fs');
 const url = require('url');
 const { join } = require('path');
 const constants = require('./utils/constants');
+const basicUtils = require('./utils/basic.utils');
 
 const PORT = process.env.PORT || 8081
 
@@ -13,19 +14,14 @@ const server = http.createServer((req, res) => {
         try {
             const data = fs.readFileSync(__dirname + join(constants.paths.logFile), 'utf8');
             console.log(data);
+            return basicUtils.generateResponse(res, 200, { 'Content-Type': 'application/json' }, constants.messages.LOG_VIEW_SUCCESS)
         } catch (err) {
             console.error(err);
+            return basicUtils.generateResponse(res, 200, { 'Content-Type': 'application/json' }, constants.messages.LOG_VIEW_ERR)
         }
-        console.log("finish");
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.write("Reading log file")
-        res.end("Ended reading");
     }
-
-
 });
 
 server.listen(PORT, () => {
     console.log(`LogReader running on port ${PORT}`);
-    console.log("sasa" + __dirname);
 })
