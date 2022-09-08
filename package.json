@@ -4,6 +4,7 @@
   "description": "send log data to client",
   "main": "server.js",
   "scripts": {
+    "start:dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/dikamjit-borah/LogReader/issues"
   },
-  "homepage": "https://github.com/dikamjit-borah/LogReader#readme"
+  "homepage": "https://github.com/dikamjit-borah/LogReader#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
 }
