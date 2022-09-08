@@ -1,0 +1,19 @@
+{
+  "name": "logreader",
+  "version": "1.0.0",
+  "description": "send log data to client",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dikamjit-borah/LogReader.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dikamjit-borah/LogReader/issues"
+  },
+  "homepage": "https://github.com/dikamjit-borah/LogReader#readme"
+}
