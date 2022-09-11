@@ -23,10 +23,10 @@ node server.js
 http://localhost:8081/log/view
 ```
 ### Parameters
-**startDate**  Start date in YYYY-MM-DD format, e.g. 2021-01-12<br>
-**endDate**  End date in YYYY-MM-DD format e.g. 2021-01-12<br>
-**startTS** Start datetime (unix time, UTC time zone) in millis, e.g. start=1369728000<br>
-**endTS** End datetime (unix time, UTC time zone) in millis, e.g. start=1369728000<br>
+**startDate**>Start date in YYYY-MM-DD format, e.g. 2021-01-12<br>
+**endDate**>End date in YYYY-MM-DD format e.g. 2021-01-12<br>
+**startTS**>Start datetime (unix time, UTC time zone) in millis, e.g. start=1369728000<br>
+**endTS**>End datetime (unix time, UTC time zone) in millis, e.g. start=1369728000<br>
 
 
 ## Functionality
