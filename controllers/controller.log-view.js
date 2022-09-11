@@ -33,7 +33,7 @@ module.exports = {
                 //if client requests logs for a particular date
                 console.log("client requests logs for a particular date");
                 console.time(constants.events.readFile)
-                const result = await serviceLogFile.fetchLogsForDates(startDate)
+                const result = await serviceLogFile.fetchLogsForDatetime(startDate)
                 console.timeEnd(constants.events.readFile)
                 if (result && result.length) return basicUtils.generateResponse(res, 200, { 'Content-Type': 'application/json' }, constants.messages.LOG_VIEW_SUCCESS, { count: result.length, logs: result })
                 else return basicUtils.generateResponse(res, 200, { 'Content-Type': 'application/json' }, constants.messages.LOG_VIEW_NO_DATA)
@@ -44,7 +44,7 @@ module.exports = {
                 console.log("client requests logs for a particular time in a particular date");
                 const datetimeIso = new Date(parseInt(startTS)).toISOString()
                 console.time(constants.events.readFile)
-                const result = await serviceLogFile.fetchLogsForDates(datetimeIso)
+                const result = await serviceLogFile.fetchLogsForDatetime(datetimeIso)
                 console.timeEnd(constants.events.readFile)
                 if (result && result.length) return basicUtils.generateResponse(res, 200, { 'Content-Type': 'application/json' }, constants.messages.LOG_VIEW_SUCCESS, { count: result.length, logs: result })
                 else return basicUtils.generateResponse(res, 200, { 'Content-Type': 'application/json' }, constants.messages.LOG_VIEW_NO_DATA)

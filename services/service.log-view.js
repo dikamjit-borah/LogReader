@@ -6,6 +6,43 @@ const config = require('../config/config')
 const logFilePath = path.join(__dirname, '../', constants.paths.logFile)
 
 module.exports = {
+
+    fetchLogsForDatetimeRange: async function (startTS, endTS) {
+
+        const startDatetime = new Date(startTS)
+        const endDatetime = new Date(endTS)
+        console.log(startDatetime)
+        console.log(endDatetime)
+        return new Promise((resolve, reject) => {
+            const readStream = fs.createReadStream(logFilePath, config.readstreamConfig)
+
+            const rl = readline.createInterface(readStream)
+            let logs = []
+
+            rl.on('line', async function (line) {
+                let logDatetime = new Date(line.split(' ')[0])
+                // console.log(logDatetime);
+
+                let startDatetimeDiff = logDatetime - startDatetime
+                let endDatetimeDiff = logDatetime - endDatetime
+                console.log(startDatetimeDiff, endDatetimeDiff);
+                if (startDatetimeDiff >= 0 && endDatetimeDiff <= 0) {
+                    logs.push(line)
+                }
+
+                else if (startDatetime < 0 || endDatetimeDiff > 0) {
+                    rl.close()
+                    readStream.destroy()
+                    resolve(logs)
+                }
+            })
+
+            rl.on('close', function () {
+                resolve(logs)
+            })
+        })
+    },
+
     fetchLogsForDates: async function (searchParamStart, searchParamEnd) {
         console.log(searchParamStart)
         console.log(searchParamEnd)
@@ -54,38 +91,22 @@ module.exports = {
         })
     },
 
-    fetchLogsForDatetimeRange: async function (startTS, endTS) {
-
-        const startDatetime = new Date(startTS)
-        const endDatetime = new Date(endTS)
-        console.log(startDatetime)
-        console.log(endDatetime)
+    fetchLogsForDatetime: async function (searchParam) {
+        console.log(searchParam)
         return new Promise((resolve, reject) => {
             const readStream = fs.createReadStream(logFilePath, config.readstreamConfig)
 
             const rl = readline.createInterface(readStream)
             let logs = []
-
+    
             rl.on('line', async function (line) {
-                let logDatetime = new Date(line.split(' ')[0])
-                // console.log(logDatetime);
-
-                let startDatetimeDiff = logDatetime - startDatetime
-                let endDatetimeDiff = logDatetime - endDatetime
-                console.log(startDatetimeDiff, endDatetimeDiff);
-                if (startDatetimeDiff >= 0 && endDatetimeDiff <= 0) {
+                if (line && line.includes(searchParam)) {
                     logs.push(line)
-                }
-
-                else if (startDatetime < 0 || endDatetimeDiff > 0) {
-                    rl.close()
-                    readStream.destroy()
-                    resolve(logs)
                 }
             })
 
             rl.on('close', function () {
-                resolve(logs)
+                resolve(logs) 
             })
         })
     },
