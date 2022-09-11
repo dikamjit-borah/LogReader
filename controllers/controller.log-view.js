@@ -1,6 +1,4 @@
 const url = require('url');
-const helperFile = require('../helpers/helper.file');
-const { fetchLogsInRange } = require('../services/service.log-file');
 const serviceLogFile = require('../services/service.log-file');
 const basicUtils = require('../utils/basic.utils')
 const constants = require('../utils/constants')
@@ -11,13 +9,20 @@ module.exports = {
             const queryObject = url.parse(req.url, true).query;
             const { startDate, endDate, startTS, endTS } = { ...queryObject }
 
-            if (startTS && Date.parse(startTS) && endTS && Date.parse(endTS)) {
+            if (startTS && parseInt(startTS) && endTS && parseInt(endTS)) {
                 //if client requests logs for a particular date and time range 
+                console.log("client requests logs for a particular date and time range ")
+                console.time(constants.events.readFile)
+                const result = await serviceLogFile.fetchLogsForDatetimeRange(parseInt(startTS), parseInt(endTS))
+                console.log(result);
+                console.timeEnd(constants.events.readFile)
+                if (result && result.length) return basicUtils.generateResponse(res, 200, { 'Content-Type': 'application/json' }, constants.messages.LOG_VIEW_SUCCESS, { count: result.length, logs: result })
+                else return basicUtils.generateResponse(res, 200, { 'Content-Type': 'application/json' }, constants.messages.LOG_VIEW_NO_DATA)
             }
 
             if (startDate && Date.parse(startDate) && endDate && Date.parse(endDate)) {
                 //if client requests logs between two dates
-                console.log("client requests logs between two dates");
+                console.log("client requests logs between two dates")
                 console.time(constants.events.readFile)
                 const result = await serviceLogFile.fetchLogsForDate(startDate, endDate)
                 console.timeEnd(constants.events.readFile)

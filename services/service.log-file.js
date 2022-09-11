@@ -28,7 +28,9 @@ module.exports = {
                         if (!lineStartIndex && line.includes(searchParamStart)) {
                             lineStartIndex = lineCount
                         }
+
                         lineCount++
+
                         if (line.includes(searchParamEnd)) {
                             lineEndIndex = lineCount
                             readStream.destroy()
@@ -40,6 +42,47 @@ module.exports = {
 
                 else if (line && line.includes(searchParamStart)) {
                     logs.push(line)
+                }
+            })
+
+            rl.on('close', function () {
+                resolve(logs)
+            })
+        })
+    },
+
+    fetchLogsForDatetimeRange: async function (startTS, endTS) {
+
+        const startDatetime = new Date(startTS)
+        const endDatetime = new Date(endTS)
+        console.log(startDatetime)
+        console.log(endDatetime)
+        return new Promise((resolve, reject) => {
+            const readStream = fs.createReadStream(logFilePath, {
+                flag: 'a+',
+                encoding: 'UTF-8',
+                highWaterMark: 24,
+                bufferSize: 64 * 1024,
+            })
+
+            const rl = readline.createInterface(readStream)
+            let logs = []
+
+            rl.on('line', async function (line) {
+                let logDatetime = new Date(line.split(' ')[0])
+                // console.log(logDatetime);
+
+                let startDatetimeDiff = logDatetime - startDatetime
+                let endDatetimeDiff = logDatetime - endDatetime
+                console.log(startDatetimeDiff, endDatetimeDiff);
+                if (startDatetimeDiff >= 0 && endDatetimeDiff <= 0) {
+                    logs.push(line)
+                }
+
+                else if (startDatetime < 0 || endDatetimeDiff > 0) {
+                    rl.close()
+                    readStream.destroy()
+                    resolve(logs)
                 }
             })
 
