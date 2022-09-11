@@ -13,8 +13,7 @@ module.exports = {
         }
         const startDatetime = new Date(startTS)
         const endDatetime = new Date(endTS)
-        console.log(startDatetime)
-        console.log(endDatetime)
+
         return new Promise((resolve, reject) => {
 
             const readStream = fs.createReadStream(logFilePath, config.readstreamConfig)
@@ -24,11 +23,10 @@ module.exports = {
 
             rl.on('line', async function (line) {
                 let logDatetime = new Date(line.split(' ')[0])
-                // console.log(logDatetime);
 
                 let startDatetimeDiff = logDatetime - startDatetime
                 let endDatetimeDiff = logDatetime - endDatetime
-                console.log(startDatetimeDiff, endDatetimeDiff);
+
                 if (startDatetimeDiff >= 0 && endDatetimeDiff <= 0) {
                     logs.push(line)
                 }
@@ -55,8 +53,7 @@ module.exports = {
         if (!fs.existsSync(logFilePath)) {
             return ([null, constants.messages.LOG_FILE_NOT_EXIST])
         }
-        console.log(searchParamStart)
-        console.log(searchParamEnd)
+
         return new Promise((resolve, reject) => {
             const readStream = fs.createReadStream(logFilePath, config.readstreamConfig)
 
@@ -79,21 +76,26 @@ module.exports = {
                             lineEndIndex = lineCount
                             readStream.destroy()
                             logs = await module.exports.fetchLogsInRowRange(lineStartIndex, lineEndIndex)
-                            resolve([logs, null])
+                            if (logs) {
+                                if (logs[1]) reject(logs[1])
+                                if (logs[0] && logs[0].length) resolve([logs[0], null])
+                            }
+                            reject([null, constants.messages.SMTHNG_WRNG])
                         }
 
                     }
                 }
 
-                else if (line && line.includes(searchParamStart)) {
-                    logs.push(line)
-                }
             })
 
             readStream.on('end', async function () {
                 lineEndIndex = lineCount
                 logs = await module.exports.fetchLogsInRowRange(lineStartIndex, lineEndIndex)
-                resolve([logs, null]) //if both start and end date are present but the end date is not found (eof reached) resolve in 'end' event of readstream
+                if (logs) {
+                    if (logs[1]) reject(logs[1])
+                    if (logs[0] && logs[0].length) resolve([logs[0], null])//if both start and end date are present but the end date is not found (eof reached) resolve in 'end' event of readstream
+                }
+                reject([null, constants.messages.SMTHNG_WRNG])
             })
 
             rl.on('close', function () {
@@ -111,7 +113,7 @@ module.exports = {
         if (!fs.existsSync(logFilePath)) {
             return ([null, constants.messages.LOG_FILE_NOT_EXIST])
         }
-        console.log(searchParam)
+
         return new Promise((resolve, reject) => {
             const readStream = fs.createReadStream(logFilePath, config.readstreamConfig)
 
@@ -139,8 +141,7 @@ module.exports = {
         if (!fs.existsSync(logFilePath)) {
             return ([null, constants.messages.LOG_FILE_NOT_EXIST])
         }
-        console.log("start row", startRow)
-        console.log("end row", endRow)
+
         return new Promise((resolve, reject) => {
             const readStream = fs.createReadStream(logFilePath, config.readstreamConfig)
             let logs = []
