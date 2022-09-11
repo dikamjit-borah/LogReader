@@ -1,13 +1,13 @@
 # LogReader
 
 ## Tech Stack
-Node.js <br>
+>Node.js
 ### Node.js modules used
-http
-url
-path
-fs
-readline
+>http <br>
+>url <br>
+>path <br>
+>fs <br>
+>readline <br>
 
 ## Installation
 ```
@@ -22,7 +22,7 @@ node server.js
 ```
 http://localhost:8081/log/view
 ```
-<sub>Parameters</sub>
+### Parameters
 **startDate**
 **endDate**
 **startTS**
