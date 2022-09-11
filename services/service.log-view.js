@@ -2,19 +2,15 @@ const path = require('path')
 const fs = require('fs')
 const readline = require('readline')
 const constants = require('../utils/constants')
+const config = require('../config/config')
 const logFilePath = path.join(__dirname, '../', constants.paths.logFile)
 
 module.exports = {
-    fetchLogsForDate: async function (searchParamStart, searchParamEnd) {
+    fetchLogsForDates: async function (searchParamStart, searchParamEnd) {
         console.log(searchParamStart)
         console.log(searchParamEnd)
         return new Promise((resolve, reject) => {
-            const readStream = fs.createReadStream(logFilePath, {
-                flag: 'a+',
-                encoding: 'UTF-8',
-                highWaterMark: 24,
-                bufferSize: 64 * 1024,
-            })
+            const readStream = fs.createReadStream(logFilePath, config.readstreamConfig)
 
             const rl = readline.createInterface(readStream)
             let logs = []
@@ -34,9 +30,10 @@ module.exports = {
                         if (line.includes(searchParamEnd)) {
                             lineEndIndex = lineCount
                             readStream.destroy()
-                            logs = await module.exports.fetchLogsInRange(lineStartIndex, lineEndIndex)
+                            logs = await module.exports.fetchLogsInRowRange(lineStartIndex, lineEndIndex)
                             resolve(logs)
                         }
+
                     }
                 }
 
@@ -45,8 +42,14 @@ module.exports = {
                 }
             })
 
+            readStream.on('end', async () => {
+                lineEndIndex = lineCount
+                logs = await module.exports.fetchLogsInRowRange(lineStartIndex, lineEndIndex)
+                resolve(logs) //if both start and end date are present but the end date is not found (eof reached) resolve in 'end' event of readstream
+            })
+
             rl.on('close', function () {
-                resolve(logs)
+                if (!searchParamEnd) resolve(logs) //if only logs of a single date required resolve here else in readstream's end event
             })
         })
     },
@@ -58,12 +61,7 @@ module.exports = {
         console.log(startDatetime)
         console.log(endDatetime)
         return new Promise((resolve, reject) => {
-            const readStream = fs.createReadStream(logFilePath, {
-                flag: 'a+',
-                encoding: 'UTF-8',
-                highWaterMark: 24,
-                bufferSize: 64 * 1024,
-            })
+            const readStream = fs.createReadStream(logFilePath, config.readstreamConfig)
 
             const rl = readline.createInterface(readStream)
             let logs = []
@@ -92,16 +90,11 @@ module.exports = {
         })
     },
 
-    fetchLogsInRange: async function (startRow, endRow) {
-        console.log(startRow)
-        console.log(endRow)
+    fetchLogsInRowRange: async function (startRow, endRow) {
+        console.log("start row", startRow)
+        console.log("end row", endRow)
         return new Promise((resolve, reject) => {
-            const readStream = fs.createReadStream(logFilePath, {
-                flag: 'a+',
-                encoding: 'UTF-8',
-                highWaterMark: 24,
-                bufferSize: 64 * 1024,
-            })
+            const readStream = fs.createReadStream(logFilePath, config.readstreamConfig)
             let logs = []
             let lineCount = 0
             const rl = readline.createInterface(readStream)
@@ -118,6 +111,7 @@ module.exports = {
                     lineCount++
                 }
             })
+
             rl.on('close', function () {
                 resolve(logs)
             })
